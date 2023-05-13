@@ -1,8 +1,10 @@
 import argparse
 import os
 
+from pathlib import Path
 
-def read_bsdf(filename: str) -> None:
+
+def read_bsdf(filename: Path) -> None:
     """read_bsdf function to read in bsdf files from the Mini-Diff V2"""
     bsdf_file = open(filename, "r")
 
@@ -21,7 +23,7 @@ def read_bsdf(filename: str) -> None:
     print("Initialising output files...")
     # Write the header to each output file (also overwrites existing files with the same name)
     for wl in wls:
-        outFileName = f"{filename[0:-5]}_{int(wl)}nm.txt"
+        outFileName = Path(f"{filename.stem}_{int(wl)}nm.txt")
         if os.path.exists(outFileName):
             continue
         with open(outFileName, "w") as outFile:
@@ -60,7 +62,7 @@ def read_bsdf(filename: str) -> None:
         if "Data" in a[0]:
             continue
         if a[0].replace(".", "").isdigit():
-            outFileName = f"{filename[0:-5]}_{wavelength}nm.txt"
+            outFileName = Path(f"{filename.stem}_{wavelength}nm.txt")
             with open(outFileName, "a") as fp:
                 for brdf in a:
                     fp.write(
@@ -83,4 +85,4 @@ if __name__ == "__main__":
     ap.add_argument("-f", "--file", default=None, help=".bsdf file to process")
     args = ap.parse_args()
 
-    read_bsdf(args.file)
+    read_bsdf(Path(args.file))
