@@ -7,7 +7,7 @@ def read_bsdf(filename: str, outFileName: str = None) -> None:
     """read_bsdf function to read in bsdf files from the Mini-Diff V2"""
     
     runTime = datetime.now()
-    bsdf_file = open('CUBI_tan.bsdf', 'r')
+    bsdf_file = open(filename, 'r')
     
     # Initial loop to see how many wavebands there are and write out headers in the 
     # appropriate files
@@ -24,12 +24,11 @@ def read_bsdf(filename: str, outFileName: str = None) -> None:
     print('Initialising output files...')
     # Write the header to each output file (also overwrites existing files with the same name)
     for wl in wls:
-        outFileName = ('%s_%inm.txt' % ('CUBI-tan.bsdf'[0:-5], int(wl)))
+        outFileName = ('%s_%inm.txt' % (filename[0:-5], int(wl)))
         if os.path.exists(outFileName):
             continue
-        outFile = open(outFileName, 'w')
-        outFile.write('*ThetaI PhiI ThetaR PhiR BRDF\n')
-        outFile.close()
+        with open(outFileName, 'w') as outFile:
+            outFile.write('*ThetaI PhiI ThetaR PhiR BRDF\n')
     
     # Initialise some counters
     f = 0
@@ -61,25 +60,18 @@ def read_bsdf(filename: str, outFileName: str = None) -> None:
             print('Writing ThetaI=%i, %inm' % (incidence_angle, wavelength))
         if 'Data' in a[0]:
             continue
-        if a[0].replace('.','').isdigit():
-            if outFileName is None:
-                outFileName = ('%s_%inm.txt' % (filename[0:-5], wavelength))
-            if datetime.fromtimestamp(os.path.getmtime(outFileName)) > runTime:
-                outFile.close()
-                outFile = open(outFileName, 'a')
+        if a[0].replace('.', '').isdigit():
+            outFileName = ('%s_%inm.txt' % (filename[0:-5], wavelength))
+            with open(outFileName, "a") as fp:
                 for brdf in a:
-                    if float(brdf) < 0.0001:
-                        continue
-                    outFile.write('%i %i %i %i %f\n' % \
-                                  (incidence_angle, pois, \
-                                   int(ScatterRadialAngles[rad_count]), \
-                                   int(ScatterAzimuths[azi_count]), float(brdf)))
+                    fp.write(
+                        f"{incidence_angle} {pois} {int(ScatterRadialAngles[rad_count])} {int(ScatterAzimuths[azi_count])} {float(brdf)}\n"
+                    )
                     rad_count += 1
-                outFile.close()
-                azi_count += 1
-                rad_count = 0
-                if azi_count == len(ScatterAzimuths):
-                    azi_count = 0
+            azi_count += 1
+            rad_count = 0
+            if azi_count == len(ScatterAzimuths):
+                azi_count = 0
     bsdf_file.close()
     print('Closing %s' % filename)
     
