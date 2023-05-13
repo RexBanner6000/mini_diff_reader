@@ -3,21 +3,16 @@ import os
 import re
 
 from pathlib import Path
-from typing import Set
+from typing import List
 
 
 def read_bsdf(filename: Path) -> None:
     """read_bsdf function to read in bsdf files from the Mini-Diff V2"""
 
-    wls = get_wavelengths(filename)  # Form a list of strings
+    wavelengths = get_wavelengths(filename)  # Form a list of strings
     print("Initialising output files...")
     # Write the header to each output file (also overwrites existing files with the same name)
-    for wl in wls:
-        outFileName = Path(f"{filename.stem}_{int(wl)}nm.txt")
-        if os.path.exists(outFileName):
-            continue
-        with open(outFileName, "w") as outFile:
-            outFile.write("*ThetaI PhiI ThetaR PhiR BRDF\n")
+    write_file_headers(filename.stem, wavelengths)
 
     # Initialise some counters
     f = 0
@@ -69,11 +64,17 @@ def read_bsdf(filename: Path) -> None:
     return
 
 
-def get_wavelengths(filename: Path) -> Set:
+def get_wavelengths(filename: Path) -> List[int]:
     with open(filename, "r") as fp:
         raw_str = fp.read()
     wavelengths = re.findall(r"Wavelength\s(\d+)", raw_str)
-    return set(wavelengths)
+    return [int(x) for x in set(wavelengths)]
+
+
+def write_file_headers(basename: str, wls: List[int]) -> None:
+    for wl in wls:
+        with open(f"{basename}_{wl}nm.txt", "w") as outFile:
+            outFile.write("*ThetaI PhiI ThetaR PhiR BRDF\n")
 
 
 if __name__ == "__main__":
