@@ -2,8 +2,7 @@ import argparse
 import os
 
 
-
-def read_bsdf(filename: Path) -> None:
+def read_bsdf(filename: str) -> None:
     """read_bsdf function to read in bsdf files from the Mini-Diff V2"""
     bsdf_file = open(filename, "r")
 
@@ -22,7 +21,7 @@ def read_bsdf(filename: Path) -> None:
     print("Initialising output files...")
     # Write the header to each output file (also overwrites existing files with the same name)
     for wl in wls:
-        outFileName = "%s_%inm.txt" % (filename[0:-5], int(wl))
+        outFileName = f"{filename[0:-5]}_{int(wl)}nm.txt"
         if os.path.exists(outFileName):
             continue
         with open(outFileName, "w") as outFile:
@@ -57,11 +56,11 @@ def read_bsdf(filename: Path) -> None:
             scattertype = a[1]
         if "TIS" in a[0]:
             TIS = a[1]
-            print("Writing ThetaI=%i, %inm" % (incidence_angle, wavelength))
+            print(f"Writing ThetaI={incidence_angle}, {wavelength}nm")
         if "Data" in a[0]:
             continue
         if a[0].replace(".", "").isdigit():
-            outFileName = "%s_%inm.txt" % (filename[0:-5], wavelength)
+            outFileName = f"{filename[0:-5]}_{wavelength}nm.txt"
             with open(outFileName, "a") as fp:
                 for brdf in a:
                     fp.write(
@@ -73,7 +72,7 @@ def read_bsdf(filename: Path) -> None:
             if azi_count == len(ScatterAzimuths):
                 azi_count = 0
     bsdf_file.close()
-    print("Closing %s" % filename)
+    print(f"Closing {filename}")
 
     return
 
