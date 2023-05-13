@@ -19,9 +19,9 @@ def read_bsdf(filename: Path) -> None:
     azi_count = 0
     rad_count = 0
     with open(filename, "r") as bsdf_file:
-        for aline in bsdf_file:  # Loops through each line
+        for line in bsdf_file:  # Loops through each line
             f += 1  # Increment counter
-            a = aline.split()
+            a = line.split()
             if not a or "#" in a[0]:
                 continue
             if any(s in a[0] for s in ["Model", "Source", "Symmetry"]):
