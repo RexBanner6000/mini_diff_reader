@@ -2,7 +2,8 @@ import argparse
 import os
 
 
-def read_bsdf(filename: str, outFileName: str = None) -> None:
+
+def read_bsdf(filename: Path) -> None:
     """read_bsdf function to read in bsdf files from the Mini-Diff V2"""
     bsdf_file = open(filename, "r")
 
@@ -80,9 +81,7 @@ def read_bsdf(filename: str, outFileName: str = None) -> None:
 if __name__ == "__main__":
 
     ap = argparse.ArgumentParser()
-
     ap.add_argument("-f", "--file", default=None, help=".bsdf file to process")
-    ap.add_argument("-o", "--output", default=None, help="Output file name")
-
     args = ap.parse_args()
-    read_bsdf(args.file, args.output)
+
+    read_bsdf(args.file)
